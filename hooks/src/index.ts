@@ -1,7 +1,7 @@
 import express from 'express';
 
 const app = express();
-import { PrismaClient } from './generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const client = new PrismaClient();
 
@@ -21,6 +21,7 @@ app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
     await client.zapRunOutbox.create({
         data:{
             zapRunId: run.id,
+            //@ts-ignore
             metadata: body
         }
     })

@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 
 const client = new PrismaClient();
 
+app.use(express.json());
 
 app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
     const { userId, zapId } = req.params;
@@ -26,7 +27,9 @@ app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
         }
     })
    })
-    
+    res.json({
+        "message": "Hook received successfully"
+    })
     //push it on to the queue (Kafka/Redis)
 
 })

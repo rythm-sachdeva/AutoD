@@ -1,6 +1,6 @@
 
 import { Router } from "express";
-import { availiableActions } from "../controllers/generic.controller";
+import { availiableActions } from "../controllers/action.controller";
 
 const router = Router();
 

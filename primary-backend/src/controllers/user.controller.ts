@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { SigninSchema, UserSchema } from "../types";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { email } from "zod";
 
 export const signUp = async (req:Request,res:Response)=>{
     const body = req.body;
@@ -26,11 +27,8 @@ export const signUp = async (req:Request,res:Response)=>{
             message: "User already exists with this email"})
     }
     const hashedPassword = await bcrypt.hash(parsedData.data.password,10);
-    const {password,...user_object}=  parsedData.data
-    const accessToken  = jwt.sign(user_object,process.env.JWT_SECRET!,{
-        expiresIn:'2h'
-    })
 
+   
  
     //@ts-ignore
     const createdUser =   await client.user.create({
@@ -40,6 +38,11 @@ export const signUp = async (req:Request,res:Response)=>{
             password: hashedPassword
         }
     });
+    const {password,...user_object} = createdUser 
+     const accessToken  = jwt.sign(user_object,process.env.JWT_SECRET!,{
+        expiresIn:'2h'
+    })
+
     
     return res.status(201).json({message:"Sign Up Success",
         username:createdUser.name,
@@ -77,6 +80,23 @@ export const signin = async(req:Request,res:Response)=>{
     })
     
     return res.status(200).json({message:"Loged In Successfully",accessToken})
+    
+}
+export const userDetails = async (req:Request,res:Response)=>{
+    //@ts-ignore
+    const id = req.id
+    const user = await client.user.findFirst({
+        where:{
+            id,
+            
+        },
+        select:{
+            name:true,
+            email:true
+        }
+    })
+
+    return res.status(200).json({name:user?.name,email:user?.email});
     
 }
 

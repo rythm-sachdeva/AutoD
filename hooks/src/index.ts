@@ -22,7 +22,6 @@ app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
     await client.zapRunOutbox.create({
         data:{
             zapRunId: run.id,
-            //@ts-ignore
             metadata: body
         }
     })

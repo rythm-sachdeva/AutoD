@@ -94,7 +94,7 @@ export const userDetails = async (req:Request,res:Response)=>{
             name:true,
             email:true
         }
-    })
+    }) 
 
     return res.status(200).json({name:user?.name,email:user?.email});
     

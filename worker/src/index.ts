@@ -1,6 +1,12 @@
+import { PrismaClient } from "@prisma/client";
+import { JsonObject } from "@prisma/client/runtime/library";
 import { Kafka } from "kafkajs";
+import { parse } from "./parser";
+
 
 const TOPIC_NAME = "zap-events";
+
+const client = new PrismaClient();
 
 const kafka= new Kafka({
     clientId: 'worker',
@@ -21,6 +27,54 @@ async function main()
             offset: message.offset,
             value: message.value?.toString(),
            })
+
+        if (!message.value?.toString()) {
+            return;
+          }
+
+          const parsedValue = JSON.parse(message.value?.to_string());
+          const zapRunId = parsedValue.zapRunId;
+          const stage = parsedValue.stage;
+
+          const zapRunDetails = await client.zapRun.findFirst({
+            where:{
+                id:zapRunId
+            },
+            include:{
+                zap:{
+                    include:{
+                        actions:{
+                            include:{
+                                type:true
+                            }
+                        }
+                    }
+                }
+            }
+          })
+ 
+          const currentAction = zapRunDetails?.zap.actions.find(x => x.sortingOrder===stage)
+          if(!currentAction)
+          {
+            console.log("No Action Found")
+            return;
+          }
+          
+          const zapRunMetaData = zapRunDetails?.metadata
+          if(currentAction.type.name === "email")
+          {
+            const body = parse((currentAction.metadata as JsonObject)?.body as string,zapRunMetaData)
+            const to = parse((currentAction.metadata as JsonObject)?.email as string,zapRunMetaData)
+            console.log(`Sending out email to ${to} and ${body}`)
+          }
+          if(currentAction.type.name ==='send-sol')
+          {
+            const amount = parse((currentAction.metadata as JsonObject)?.amount as string, zapRunMetaData);
+            const address = parse((currentAction.metadata as JsonObject)?.address as string, zapRunMetaData);
+            console.log(`Sending out SOL of ${amount} to address ${address}`);
+          }
+
+
 
            await new Promise(r=> setTimeout(r,5000));
            await consumer.commitOffsets(

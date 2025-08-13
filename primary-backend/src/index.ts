@@ -5,6 +5,7 @@ import { triggerRouter } from './router/trigger.router';
 import { userRouter } from './router/user.router';
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser"
+import { zapRouter } from './router/zap.router';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ app.use(cors());
 app.use('/api/v1/action',actionRouter)
 app.use('/api/v1/trigger', triggerRouter)
 app.use('/api/v1/user',userRouter)
+app.use('/api/v1/zap',zapRouter)
 
 app.listen(3000, ()=>{
     console.log("app is running on port 3000");

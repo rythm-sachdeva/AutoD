@@ -7,11 +7,34 @@ import axios from "axios";
 import { useState } from "react";
 import { BACKEND_URL } from "../config";
 import { useRouter } from "next/navigation";
+import { LoginFailedToast } from "@/components/Toast";
 
 export default function() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const router = useRouter();
+    const [showToast, setShowToast] = useState(false);
+    
+
+const signinRequest = async () => {
+    const res = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
+        //@ts-ignore
+        email,
+        password,
+    });
+    
+    if(res.data.token)
+    {
+     //@ts-ignore
+     localStorage.setItem("token", res.data.token);
+     router.push("/dashboard");
+    }
+    else{
+     setShowToast(true)
+        
+    }
+   
+}
     
     return <div> 
         <Appbar />
@@ -38,17 +61,16 @@ export default function() {
                         setPassword(e.target.value);
                     }} label={"Password"} type="password" placeholder="Password"></Input>
                     <div className="pt-4">
-                        <PrimaryButton onClick={async () => {
-                            const res = await axios.post(`${BACKEND_URL}/api/v1/user/signin`, {
-                                username: email,
-                                password,
-                            });
-                            localStorage.setItem("token", res.data.token);
-                            router.push("/dashboard");
-                        }} size="big">Login</PrimaryButton>
+                        <PrimaryButton onClick={signinRequest} size="big">Login</PrimaryButton>
                     </div>
                 </div>
             </div>
         </div>
+        {showToast && (
+        <LoginFailedToast
+          message="Login failed. Please check your credentials."
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
 }

@@ -54,14 +54,16 @@ export const signUp = async (req:Request,res:Response)=>{
 
 export const signin = async(req:Request,res:Response)=>{
     const body = req.body
+    console.log(body)
     const parsedData = SigninSchema.safeParse(body)
+    console.log("Request For Signin")
     if(!parsedData.success)
     {
         return res.status(411).json({message:"Wrong Input"})
     }
     const user = await client.user.findFirst({
         where:{
-            name:parsedData.data.username
+            email:parsedData.data.email
         }
     })
     if(!user)
@@ -78,8 +80,7 @@ export const signin = async(req:Request,res:Response)=>{
     const accessToken = jwt.sign(user_object,process.env.JWT_SECRET!,{
         expiresIn:'24h'
     })
-    
-    return res.status(200).json({message:"Loged In Successfully",accessToken})
+    return res.status(200).json({message:"Loged In Successfully",token:accessToken})
     
 }
 export const userDetails = async (req:Request,res:Response)=>{

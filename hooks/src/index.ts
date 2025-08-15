@@ -16,13 +16,14 @@ app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
    await client.$transaction(async (tx)=>{
     const run =  await client.zapRun.create({
         data:{
-            zapId: zapId
+            zapId: zapId,
+            metadata: body
         }
     })
     await client.zapRunOutbox.create({
         data:{
             zapRunId: run.id,
-            metadata: body
+            
         }
     })
    })
@@ -33,6 +34,6 @@ app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
 
 })
 
-app.listen(3000,()=>{
-    console.log('Server is running on port 3000');
+app.listen(3001,()=>{
+    console.log('Server is running on port 3001');
 })

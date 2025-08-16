@@ -45,6 +45,7 @@ function useZaps() {
             }
         })
             .then(res => {
+                //@ts-ignore
                 setZaps(res.data.zaps);
                 setLoading(false)
             })

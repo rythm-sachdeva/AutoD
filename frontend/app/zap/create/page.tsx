@@ -15,11 +15,14 @@ function useAvailableActionsAndTriggers() {
     const [availableTriggers, setAvailableTriggers] = useState([]);
 
     useEffect(() => {
-        axios.get(`${BACKEND_URL}/api/v1/trigger/available`)
-            .then(x => setAvailableTriggers(x.data.availableTriggers))
+        axios.get(`${BACKEND_URL}/api/v1/trigger/availiable`)
+            .then(x => {
+                // console.log(x)
+                setAvailableTriggers(x.data)
+            })
 
-        axios.get(`${BACKEND_URL}/api/v1/action/available`)
-            .then(x => setAvailableActions(x.data.availableActions))
+        axios.get(`${BACKEND_URL}/api/v1/action/availiable`)
+            .then(x => setAvailableActions(x.data))
     }, [])
 
     return {
@@ -51,15 +54,16 @@ export default function() {
                 if (!selectedTrigger?.id) {
                     return;
                 }
-
-                const response = await axios.post(`${BACKEND_URL}/api/v1/zap`, {
+                const object = {
                     "availableTriggerId": selectedTrigger.id,
                     "triggerMetadata": {},
                     "actions": selectedActions.map(a => ({
                         availableActionId: a.availableActionId,
                         actionMetadata: a.metadata
                     }))
-                }, {
+                }
+                console.log(object)
+                const response = await axios.post(`${BACKEND_URL}/api/v1/zap`,object , {
                     headers: {
                         Authorization: localStorage.getItem("token")
                     }
@@ -147,14 +151,14 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                     </button>
                 </div>
                 <div className="p-4 md:p-5 space-y-4">
-                    {step === 1 && selectedAction?.id === "email" && <EmailSelector setMetadata={(metadata) => {
+                    {step === 1 && selectedAction?.name === "send-email" && <EmailSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
                         })
                     }} />}
 
-                    {(step === 1 && selectedAction?.id === "send-sol") && <SolanaSelector setMetadata={(metadata) => {
+                    {(step === 1 && selectedAction?.name === "send-solana") && <SolanaSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
@@ -162,7 +166,7 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                     }} />}
 
                     {step === 0 && <div>{availableItems.map(({id, name, image}) => {
-                            return <div onClick={() => {
+                            return <div key={id} onClick={() => {
                                 if (isTrigger) {
                                     onSelect({
                                         id,

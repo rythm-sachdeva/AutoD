@@ -6,6 +6,7 @@ export const zapCreator = async (req:Request,res:Response) =>{
     //@ts-ignore
     const id = req.id
     const body = req.body
+    console.log(body)
     const parsedData = ZapCreateSchema.safeParse(body)
     if(!parsedData.success)
     {
@@ -13,7 +14,7 @@ export const zapCreator = async (req:Request,res:Response) =>{
     }
 
     const zapId = await client.$transaction(async tx=>{
-        const zap = await client.zap.create({
+        const zap = await tx.zap.create({
             data:{
                 userId: parseInt(id),
                 triggerId:"",
@@ -36,7 +37,7 @@ export const zapCreator = async (req:Request,res:Response) =>{
             }
         });
 
-        await client.zap.update({
+        await tx.zap.update({
             where:{
                 id : zap.id
             },

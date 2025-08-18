@@ -1,13 +1,14 @@
 import { Response,Request } from "express"
 import { ZapCreateSchema } from "../types"
 import client from "../db"
+import { parse } from "dotenv"
 
 export const zapCreator = async (req:Request,res:Response) =>{
     //@ts-ignore
     const id = req.id
     const body = req.body
-    console.log(body)
     const parsedData = ZapCreateSchema.safeParse(body)
+    console.log(parsedData)
     if(!parsedData.success)
     {
         res.status(400).json({message:"Wrong Inputs"})

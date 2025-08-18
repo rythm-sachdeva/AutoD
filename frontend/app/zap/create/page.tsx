@@ -1,6 +1,6 @@
 "use client";
 
-import { BACKEND_URL } from "@/app/config";
+import { BACKEND_URL, SEND_EMAIL, SEND_SOL } from "@/app/config";
 import { Appbar } from "@/components/Appbar";
 import { Input } from "@/components/Input";
 import { ZapCell } from "@/components/ZapCell";
@@ -58,7 +58,7 @@ export default function() {
                     "availableTriggerId": selectedTrigger.id,
                     "triggerMetadata": {},
                     "actions": selectedActions.map(a => ({
-                        availableActionId: a.availableActionId,
+                        availiableActionId: a.availableActionId,
                         actionMetadata: a.metadata
                     }))
                 }
@@ -151,14 +151,14 @@ function Modal({ index, onSelect, availableItems }: { index: number, onSelect: (
                     </button>
                 </div>
                 <div className="p-4 md:p-5 space-y-4">
-                    {step === 1 && selectedAction?.name === "send-email" && <EmailSelector setMetadata={(metadata) => {
+                    {step === 1 && selectedAction?.id === SEND_EMAIL && <EmailSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata
                         })
                     }} />}
 
-                    {(step === 1 && selectedAction?.name === "send-solana") && <SolanaSelector setMetadata={(metadata) => {
+                    {(step === 1 && selectedAction?.id === SEND_SOL) && <SolanaSelector setMetadata={(metadata) => {
                         onSelect({
                             ...selectedAction,
                             metadata

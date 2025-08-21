@@ -59,7 +59,7 @@ export default function() {
                     "triggerMetadata": {},
                     "actions": selectedActions.map(a => ({
                         availiableActionId: a.availableActionId,
-                        actionMetadata: a.metadata
+                        actionMetaData: a.metadata
                     }))
                 }
                 console.log(object)

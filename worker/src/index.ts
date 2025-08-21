@@ -32,7 +32,7 @@ async function main()
             return;
           }
 
-          const parsedValue = JSON.parse(message.value?.to_string());
+          const parsedValue = JSON.parse(message.value?.toString());
           const zapRunId = parsedValue.zapRunId;
           const stage = parsedValue.stage;
 
@@ -61,9 +61,13 @@ async function main()
           }
           
           const zapRunMetaData = zapRunDetails?.metadata
-          if(currentAction.type.name === "email")
+          console.log(`Zap Run Metadata: ${JSON.stringify(zapRunMetaData)}`);
+          console.log(`Processing action: ${currentAction.type.name} for zap run ID: ${zapRunId}`);
+          if(currentAction.type.name === "send-email")
           {
+            console.log("Processing email action");
             const body = parse((currentAction.metadata as JsonObject)?.body as string,zapRunMetaData)
+            console.log(`Email body: ${body}`);
             const to = parse((currentAction.metadata as JsonObject)?.email as string,zapRunMetaData)
             console.log(`Sending out email to ${to} and ${body}`)
           }

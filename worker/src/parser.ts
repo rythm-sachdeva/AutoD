@@ -1,5 +1,6 @@
 export function parse(text:string,values:any,startDelimeter = "{",endDelimiter="}")
 {
+    console.log(`Parsing text: ${text} with values: ${JSON.stringify(values)}`);
     let startIndex = 0;
     let endIndex = 1;
     let finalString ="";

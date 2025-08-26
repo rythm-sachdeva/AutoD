@@ -1,44 +1,40 @@
-export function parse(text:string,values:any,startDelimeter = "{",endDelimiter="}")
-{
-    console.log(`Parsing text: ${text} with values: ${JSON.stringify(values)}`);
-    let startIndex = 0;
-    let endIndex = 1;
-    let finalString ="";
-    while(endIndex<text.length)
-    {
-        if(text[startIndex] === startDelimeter)
-        {
-            let endPoint = startIndex + 2;
-            while(text[endPoint] !== endDelimiter)
-            {
-                endPoint++;
-            }
-            let stringHoldingValue = text.slice(startIndex+1,endPoint)
-            const keys = stringHoldingValue.split(".");
-            let localValues = {
-                ...values
-            }
-            for(let i = 0;i<keys.length;i++)
-            {
-                if(typeof localValues === "string")
-                {
-                    localValues = JSON.parse(localValues)
-                }
-                localValues = localValues[keys[i]];
-            }
-            finalString += localValues;
-            startIndex = endPoint+1;
-            endIndex = endPoint + 2;
-        }
-        else{
-            finalString += text[startIndex];
-            startIndex++;
-            endIndex++;
-        }
+export function parse(text: string, values: any, startDelimeter = "{", endDelimiter = "}") {
+  console.log(`Parsing text: ${text} with values: ${JSON.stringify(values)}`);
+
+  // Step 1: First, ensure 'values' is a parsed object.
+  let parsedValues = values;
+  if (typeof parsedValues === "string") {
+    try {
+      parsedValues = JSON.parse(parsedValues);
+    } catch (e) {
+      console.error("Error: The provided 'values' string is not valid JSON.");
+      return text;
     }
-    if(text[startIndex])
-    {
-        finalString += text[startIndex]
+  }
+
+  // Step 2: NOW, create the nested structure the template expects, using the parsed object.
+  const dataForTemplate = {
+    comment: {
+      email: parsedValues.email 
     }
-    return finalString
+  };
+
+  const regex = new RegExp(`\\${startDelimeter}(.*?)\\${endDelimiter}`, "g");
+
+  const finalString = text.replace(regex, (match, keyPath) => {
+    const keys = keyPath.split(".");
+    
+    // Step 3: Use the new nested 'dataForTemplate' object for the lookup.
+    //@ts-ignore
+    const result = keys.reduce((currentObject, currentKey) => {
+      if (currentObject && typeof currentObject === 'object' && currentKey in currentObject) {
+        return currentObject[currentKey];
+      }
+      return undefined;
+    }, dataForTemplate); // <-- This now correctly uses the nested data
+
+    return result !== undefined ? result : match;
+  });
+
+  return finalString;
 }

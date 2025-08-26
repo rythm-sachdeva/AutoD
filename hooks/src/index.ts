@@ -7,9 +7,13 @@ const client = new PrismaClient();
 
 app.use(express.json());
 
+app.get('/hooks/catch/:userId/:zapId', async (req,res)=>{
+    return res.json({message:"Hello From Hooks"})
+})
 app.post('/hooks/catch/:userId/:zapId', async (req,res)=>{
     const { userId, zapId } = req.params;
     const body = req.body;
+    console.log('Received body:', body);
     console.log(`Received hook for user ${userId} and zap ${zapId}`);
     
     // store in db a new trigger

@@ -62,14 +62,17 @@ async function main()
           }
           
           const zapRunMetaData = zapRunDetails?.metadata
+          console.log(zapRunMetaData)
           console.log(`Zap Run Metadata: ${JSON.stringify(zapRunMetaData)}`);
           console.log(`Processing action: ${currentAction.type.name} for zap run ID: ${zapRunId}`);
           if(currentAction.type.name === "send-email")
           {
             console.log("Processing email action");
-            const body = parse((currentAction.metadata as JsonObject)?.body as string,zapRunMetaData)
+            //@ts-ignore
+            const body = parse((currentAction.metadata as JsonObject)?.body as string,zapRunMetaData.comment.body)
             console.log(`Email body: ${body}`);
-            const to = parse((currentAction.metadata as JsonObject)?.email as string,zapRunMetaData)
+            //@ts-ignore
+            const to = parse((currentAction.metadata as JsonObject)?.email as string,zapRunMetaData.comment.body)
             console.log(`Sending out email to ${to} and ${body}`)
             sendEmail(to,`Notification from github issue`,body)
           }
